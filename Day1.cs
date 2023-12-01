@@ -40,32 +40,28 @@ public class Day1
 
         var result = File
             .ReadAllLines("1.txt")
-            .Select(line =>
-            {
-                List<int> digits = new();
-
-                for (int i = 0; i < line.Length; i++)
+            .Select(line => line
+                .Select((c, i) =>
                 {
-                    if (char.IsDigit(line[i]))
+                    if (char.IsDigit(c))
                     {
-                        var num = line[i] - '0';
-                        digits.Add(num);
+                        var num = c - '0';
+                        return num;
                     }
-                    else
+
+                    foreach (KeyValuePair<string, int> pair in mapping)
                     {
-                        foreach (KeyValuePair<string, int> pair in mapping)
+                        if (line.AsSpan(i).StartsWith(pair.Key))
                         {
-                            if (line.AsSpan(i).StartsWith(pair.Key))
-                            {
-                                digits.Add(pair.Value);
-                                break;
-                            }
+                            return pair.Value;
                         }
                     }
-                }
 
-                return digits;
-            })
+                    return -1;
+
+                })
+                .Where(n => n != -1)
+                .ToArray())
             // .Select(k =>
             // {
             //     Console.WriteLine(string.Join(' ', k));
@@ -75,5 +71,4 @@ public class Day1
             .Sum();
         Console.WriteLine(result);
     }
-
 }
