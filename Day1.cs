@@ -50,15 +50,16 @@ public class Day1
                     {
                         var num = line[i] - '0';
                         digits.Add(num);
-                        continue;
                     }
-
-                    foreach (KeyValuePair<string, int> pair in mapping)
+                    else
                     {
-                        if (line.Substring(i).StartsWith(pair.Key))
+                        foreach (KeyValuePair<string, int> pair in mapping)
                         {
-                            digits.Add(pair.Value);
-                            break;
+                            if (line.AsSpan(i).StartsWith(pair.Key))
+                            {
+                                digits.Add(pair.Value);
+                                break;
+                            }
                         }
                     }
                 }
