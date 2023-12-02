@@ -2,6 +2,10 @@
 
 using static Lesniak.AoC2023.Utils;
 
-Header(1);
-Day1.Part1();
-Day1.Part2();
+// Header(1);
+// Day1.Part1();
+// Day1.Part2();
+
+Header(2);
+Day2.Part1();
+// Day1.Part2();
