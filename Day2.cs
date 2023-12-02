@@ -24,15 +24,14 @@ public class Day2
 
     private static int MinimumValidChoice(string line)
     {
-        Console.WriteLine(line);
+        // Console.WriteLine(line);
         var parts = line.Split(":");
         var choices = parts[1].Split(";").Select(s => s.Trim());
 
-        // rgb
-        foreach (var choice in choices)
-        {
-            Console.WriteLine(choice);
-        }
+        // foreach (var choice in choices)
+        // {
+        //     Console.WriteLine(choice);
+        // }
         List<List<int>> maxs = choices.Select(ComputeMax).ToList();
         
         // max of r, max of g, max of b
