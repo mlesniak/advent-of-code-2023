@@ -34,7 +34,7 @@ public class Day3
                 {
                     var startCol = col;
                     var sb = new StringBuilder();
-                    while (col <= line.Length && char.IsDigit(line[col]))
+                    while (col < line.Length && char.IsDigit(line[col]))
                     {
                         sb.Append(line[col]);
                         col++;
@@ -47,7 +47,8 @@ public class Day3
                     }
                 }
 
-                if (line[col] == '.')
+
+                if (col == line.Length || line[col] == '.')
                 {
                     continue;
                 }
