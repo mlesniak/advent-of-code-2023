@@ -152,7 +152,7 @@ record Range(long Destination, long Source, long Length)
 {
     public bool Contains(long position)
     {
-        return position >= Source && position <= Source + Length;
+        return position >= Source && position <= Source + Length - 1;
     }
 
     // 88 18 7
@@ -168,7 +168,7 @@ record RangeReverse(long Destination, long Source, long Length)
 {
     public bool Contains(long position)
     {
-        return position >= Source && position <= Source + Length;
+        return position >= Source && position <= Source + Length - 1;
     }
 
     // 88 18 7
