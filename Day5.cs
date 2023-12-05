@@ -14,7 +14,7 @@ public class Day5
             .Split(" ")
             .Select(s => s.Trim())
             .Where(s => s.Length > 0)
-            .Select(Int32.Parse);
+            .Select(Int64.Parse);
 
         // Use the order as defined in the file.
         // Let's hope it's the right one.
@@ -27,10 +27,10 @@ public class Day5
             maps.Add(rm);
         }
 
-        var result = Int32.MaxValue;
+        long result = Int64.MaxValue;
         foreach (var seed in seeds)
         {
-            int step = seed;
+            long step = seed;
             for (int i = 0; i < maps.Count; i++)
             {
                 // Console.WriteLine("\nNEXT STEP");
@@ -55,14 +55,14 @@ class RangeMap
     {
         var lines = source.Split("\n");
         Name = lines[0].Split(" ")[0];
-        for (int i = 1; i < lines.Length; i++)
+        for (long i = 1; i < lines.Length; i++)
         {
-            var parts = lines[i].Split(" ").Select(Int32.Parse).ToList();
+            var parts = lines[i].Split(" ").Select(Int64.Parse).ToList();
             ranges.Add(new Range(parts[0], parts[1], parts[2]));
         }
     }
 
-    public int ComputeDestination(int source)
+    public long ComputeDestination(long source)
     {
         foreach (var range in ranges)
         {
@@ -89,9 +89,9 @@ class RangeMap
     }
 }
 
-record Range(int Destination, int Source, int Length)
+record Range(long Destination, long Source, long Length)
 {
-    public bool Contains(int position)
+    public bool Contains(long position)
     {
         return position >= Source && position <= Source + Length;
     }
@@ -99,7 +99,7 @@ record Range(int Destination, int Source, int Length)
     // 88 18 7
     // destination: 88 89 90 91 92 93 94 
     // source:      18 19 20 21 22 23 24
-    public int Transpose(int position)
+    public long Transpose(long position)
     {
         return Destination + (position - Source);
     }
