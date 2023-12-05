@@ -100,11 +100,6 @@ public class Day5
                     return;
                 }
             }
-
-            if (location > 50)
-            {
-                break;
-            }
         }
     }
 }
