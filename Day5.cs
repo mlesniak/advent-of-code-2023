@@ -43,6 +43,56 @@ public class Day5
 
         Console.WriteLine(result);
     }
+
+    public static void Part2()
+    {
+        var input = File.ReadAllText("5.txt");
+        var parts = input.Split("\n\n");
+
+        List<(long, long)> seeds = new();
+
+        var nums = parts[0]
+            .Split(":")[1]
+            .Split(" ")
+            .Select(s => s.Trim())
+            .Where(s => s.Length > 0)
+            .Select(Int64.Parse)
+            .ToList();
+        for (var i = 0; i < nums.Count; i += 2)
+        {
+            seeds.Add((nums[i], nums[i] + nums[i + 1]));
+        }
+
+        // Use the order as defined in the file.
+        // Let's hope it's the right one.
+        var maps = new List<RangeMap>();
+
+        for (var i = 1; i < parts.Length; i++)
+        {
+            var part = parts[i];
+            var rm = new RangeMap(part);
+            maps.Add(rm);
+        }
+
+        long result = Int64.MaxValue;
+        foreach (var seedPair in seeds)
+        {
+            for (long seed = seedPair.Item1; seed <= seedPair.Item2; seed++)
+            {
+                long step = seed;
+                for (int i = 0; i < maps.Count; i++)
+                {
+                    // Console.WriteLine("\nNEXT STEP");
+                    // Console.WriteLine(maps[i]);
+                    step = maps[i].ComputeDestination(step);
+                    // Console.WriteLine(step);
+                }
+                result = Math.Min(result, step);
+            }
+        }
+
+        Console.WriteLine(result);
+    }
 }
 
 // Map for a single type.
