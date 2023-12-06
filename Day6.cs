@@ -43,8 +43,8 @@ public class Day6
             .Where(p => p.Length > 0)
             .Aggregate((l, r) => l + r));
 
-        Console.WriteLine(times);
-        Console.WriteLine(distances);
+        // Console.WriteLine(times);
+        // Console.WriteLine(distances);
 
         long result = ComputeWins(times, distances);
         Console.WriteLine(result);
