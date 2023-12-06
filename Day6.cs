@@ -18,14 +18,35 @@ public class Day6
             .Select(Int64.Parse)
             .ToList();
 
-        Console.WriteLine(string.Join(" ", times));
-        Console.WriteLine(string.Join(" ", distances));
+        // Console.WriteLine(string.Join(" ", times));
+        // Console.WriteLine(string.Join(" ", distances));
 
         long result = 1;
         for (var i = 0; i < times.Count; i++)
         {
             result *= ComputeWins(times[i], distances[i]);
         }
+        Console.WriteLine(result);
+    }
+
+    public static void Part2()
+    {
+        var lines = File.ReadAllLines("6.txt");
+        var times = Int64.Parse(lines[0]
+            .Split(":")[1]
+            .Split(" ")
+            .Where(p => p.Length > 0)
+            .Aggregate((l, r) => l + r));
+        var distances = Int64.Parse(lines[1]
+            .Split(":")[1]
+            .Split(" ")
+            .Where(p => p.Length > 0)
+            .Aggregate((l, r) => l + r));
+
+        Console.WriteLine(times);
+        Console.WriteLine(distances);
+
+        long result = ComputeWins(times, distances);
         Console.WriteLine(result);
     }
 
