@@ -11,18 +11,27 @@ public enum CardScore
     HighCard     = 1
 }
 
-public record Card(string input)
+public record Card(string input) : IComparable<Card>
 {
-    // 1 High card
-    // 2 One pair
-    // 3 Two pair
-    // 4 Three of a kind
-    // 5 Full house
-    // 6 Four of a kind
-    // 7 Five of a kind
-    public CardScore Score()
+    private static Dictionary<char, int> Values = new Dictionary<char, int>()
     {
-        // Move card values into a map <char, count>
+        {'2', 2},
+        {'3', 3},
+        {'4', 4},
+        {'5', 5},
+        {'6', 6},
+        {'7', 7},
+        {'8', 8},
+        {'9', 9},
+        {'T', 10},
+        {'J', 11},
+        {'Q', 12},
+        {'K', 13},
+        {'A', 14}
+    };
+
+    public (CardScore, List<int>) Score()
+    {
         var map = new Dictionary<char, int>();
         foreach (var c in input)
         {
@@ -34,40 +43,60 @@ public record Card(string input)
             map[c] = cur + 1;
         }
 
-        // foreach (var pair in map)
-        // {
-        //     Console.WriteLine($"{pair.Key} -> {pair.Value}");    
-        // }
+        var numerics = input.Select(c => Values[c]).ToList();
+        numerics.Sort();
+        numerics.Reverse();
 
         var counts = map.Values.ToList();
-        Console.WriteLine(string.Join(",", counts));
 
         if (counts.Contains(5))
         {
-            return CardScore.FiveOfAKind;
+            return (CardScore.FiveOfAKind, numerics);
         }
         if (counts.Contains(4))
         {
-            return CardScore.FourOfAKind;
+            return (CardScore.FourOfAKind, numerics);
         }
         if (counts.Contains(3) && counts.Contains(2))
         {
-            return CardScore.FullHouse;
+            return (CardScore.FullHouse, numerics);
         }
         if (counts.Contains(3))
         {
-            return CardScore.ThreeOfAKind;
+            return (CardScore.ThreeOfAKind, numerics);
         }
         if (counts.Count(n => n == 2) == 2)
         {
-            return CardScore.TwoPair;
+            return (CardScore.TwoPair, numerics);
         }
         if (counts.Contains(2))
         {
-            return CardScore.OnePair;
+            return (CardScore.OnePair, numerics);
         }
 
-        return CardScore.HighCard;
+        return (CardScore.HighCard, numerics);
+    }
+
+
+    public int CompareTo(Card other)
+    {
+        var (score, values) = Score();
+        var (oscore, ovalues) = other.Score();
+
+        if (score != oscore)
+        {
+            return score - oscore;
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            if (values[i] != ovalues[i])
+            {
+                return values[i] - ovalues[i];
+            } 
+        }
+
+        return 0;
     }
 }
 
@@ -75,7 +104,9 @@ public class Day7
 {
     public static void Part1()
     {
-        var cards = File.ReadAllLines("7.txt")
+        // AKJJ2 OnePair
+        // ATQQ5 OnePair
+        var cardsBids = File.ReadAllLines("7.txt")
             .Select(line =>
             {
                 var ps = line.Split(" ");
@@ -84,10 +115,21 @@ public class Day7
                 return (card, bid);
             }).ToDictionary();
 
-        foreach (var pair in cards)
+        var cards = cardsBids.Keys.ToList();
+        cards.Sort();
+
+
+        var sum = 0;
+        for (int i = 0; i < cards.Count; i++)
         {
-            Console.WriteLine(pair.Key);
-            Console.WriteLine(pair.Key.Score());
+            sum += cardsBids[cards[i]] * (i + 1);
         }
+        Console.WriteLine(sum);
+
+        // foreach (var card in cardsBids)
+        // {
+        //     var score = string.Join(" ", card.Key.Score().Item2);
+        //     Console.WriteLine($"{card} {score}");
+        // }
     }
 }
