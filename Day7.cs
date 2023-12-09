@@ -44,8 +44,8 @@ public record Card(string input) : IComparable<Card>
         }
 
         var numerics = input.Select(c => Values[c]).ToList();
-        numerics.Sort();
-        numerics.Reverse();
+        // numerics.Sort();
+        // numerics.Reverse();
 
         var counts = map.Values.ToList();
 
@@ -110,7 +110,7 @@ public class Day7
             .Select(line =>
             {
                 var ps = line.Split(" ");
-                var bid = Int32.Parse(ps[1]);
+                var bid = Int64.Parse(ps[1]);
                 var card = new Card(ps[0]);
                 return (card, bid);
             }).ToDictionary();
@@ -119,7 +119,7 @@ public class Day7
         cards.Sort();
 
 
-        var sum = 0;
+        long sum = 0;
         for (int i = 0; i < cards.Count; i++)
         {
             sum += cardsBids[cards[i]] * (i + 1);
