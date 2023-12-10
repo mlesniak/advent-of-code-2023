@@ -60,31 +60,53 @@ public class Day8
         }
 
         // Computation.
-        var nexts = new List<string>();
-        foreach (var k in nodes.Keys.Where(n => n[^1] == 'A'))
+        var nexts = nodes.Keys.Where(n => n[^1] == 'A').ToList();
+
+        // Wild guess: The paths are all independent.
+        // Compute path to first '..Z' separately. Since
+        // they are independent, the LCM of all path length
+        // is the solution where they all 'meet'.
+
+        var distances = new List<long>();
+        foreach (var next in nexts)
         {
-            nexts.Add(k);
+            var d = ComputeDistance(nodes, instructions, next);
+            distances.Add(d);
+            Console.WriteLine(next);
+            Console.WriteLine(d);
         }
 
+        var result = distances.Aggregate(lcm);
+        Console.WriteLine(result);
+    }
+
+    static long gcf(long a, long b)
+    {
+        while (b != 0)
+        {
+            long temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    static long lcm(long a, long b)
+    {
+        return (a / gcf(a, b)) * b;
+    }
+
+    private static long ComputeDistance(Dictionary<string, LeftRight> nodes, string instructions, string cur)
+    {
         int step = 0;
         long count = 0;
-        while (nexts.Any(n => n[^1] != 'Z'))
+        while (cur[^1] != 'Z')
         {
-            var ns = new List<string>();
-
-            foreach (var next in nexts)
-            {
-                var cur = nodes[next].Get(instructions[step]);
-                ns.Add(cur);
-            }
-            Console.WriteLine(string.Join(" ", ns));
-            nexts = ns;
-
+            cur = nodes[cur].Get(instructions[step]);
             step = (step + 1) % instructions.Length;
             count++;
         }
-
-        Console.WriteLine(count);
+        return count;
     }
 
 }
