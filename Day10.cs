@@ -66,7 +66,7 @@ public class Day10
                 {
                     cur = next;
                     steps++;
-                    Console.WriteLine(cur);
+                    // Console.WriteLine(cur);
                     visited.Add(cur);
                     found = true;
                     break;
