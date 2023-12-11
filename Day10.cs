@@ -58,6 +58,10 @@ public class Day10
                     // We are back at the starting position.
                     return steps;
                 }
+                if (!map.ContainsKey(cur) || !map.ContainsKey(next))
+                {
+                    continue;
+                }
                 if (!visited.Contains(next) && ValidMove(delta, map[cur], map[next]))
                 {
                     cur = next;
