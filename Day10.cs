@@ -15,7 +15,7 @@ public class Day10
         }
 
         var startPos = map.First(pair => pair.Value == 'S').Key;
-        Console.WriteLine(startPos);
+        // Console.WriteLine(startPos);
 
         var pipes = "-|LF7J";
         foreach (var pipe in pipes)
@@ -23,11 +23,12 @@ public class Day10
             map[startPos] = pipe;
             if (ValidMap(map, startPos))
             {
-                Console.WriteLine($"Potential start found for char {pipe}");
-                var steps = ValidLoop(map, startPos);
+                // Console.WriteLine($"Potential start found for char {pipe}");
+                var (steps, _) = ValidLoop(map, startPos);
                 if (steps != -1)
                 {
-                    Console.WriteLine($"Valid loop for {pipe}: steps={steps}, maxDist={steps / 2}");
+                    // Console.WriteLine($"Valid loop for {pipe}: steps={steps}, maxDist={steps / 2}");
+                    Console.WriteLine(steps / 2);
                 }
             }
         }
@@ -36,12 +37,12 @@ public class Day10
         // while following the pipes.
     }
 
-    private static int ValidLoop(Dictionary<(int, int), char> map, (int, int) startPos)
+    private static (int, HashSet<(int, int)>) ValidLoop(Dictionary<(int, int), char> map, (int, int) startPos)
     {
         var cur = startPos;
         var visited = new HashSet<(int, int)>();
         visited.Add(cur);
-        Console.WriteLine(cur);
+        // Console.WriteLine(cur);
 
         var steps = 1;
         while (true)
@@ -56,7 +57,7 @@ public class Day10
                 if (steps > 2 && next == startPos)
                 {
                     // We are back at the starting position.
-                    return steps;
+                    return (steps, visited);
                 }
                 if (!map.ContainsKey(cur) || !map.ContainsKey(next))
                 {
@@ -75,7 +76,7 @@ public class Day10
             if (!found)
             {
                 // No valid non-visited move found at all.
-                return -1;
+                return (-1, visited);
             }
         }
     }
@@ -182,5 +183,95 @@ public class Day10
         }
 
         return false;
+    }
+
+    // Idea: double spacing. 
+    // Create a new map with just the path tiles, but double spacing.
+    // Flood fill.
+    // Count at all the remaining, which have not been flooded, but divide by 2*2.
+    public static void Part2()
+    {
+        var lines = File.ReadAllLines("10.txt");
+        var map = new Dictionary<(int, int), char>();
+        for (var y = 0; y < lines.Length; y++)
+        {
+            for (var x = 0; x < lines[y].Length; x++)
+            {
+                map[(x, y)] = lines[y][x];
+            }
+        }
+
+        var startPos = map.First(pair => pair.Value == 'S').Key;
+        var pipes = "-|LF7J";
+        HashSet<(int, int)> path = null;
+        foreach (var pipe in pipes)
+        {
+            map[startPos] = pipe;
+            if (ValidMap(map, startPos))
+            {
+                var (steps, p) = ValidLoop(map, startPos);
+                if (steps != -1)
+                {
+                    path = p;
+                    break;
+                }
+            }
+        }
+
+        var maxWidth = lines[0].Length;
+        var maxHeight = lines.Length;
+        var floodMap = new Dictionary<(int, int), char>();
+        for (int row = 0; row < maxHeight; row++)
+        {
+            for (int col = 0; col < maxWidth; col++)
+            {
+                floodMap[(col, row)] = '.';
+            }
+        }
+
+        var s = string.Join(", ", path.ToList());
+        Console.WriteLine(s);
+        foreach (var pair in path)
+        {
+            floodMap[pair] = map[pair];
+        }
+
+        // Flood fill via BFS.
+        var queue = new Queue<(int, int)>();
+        var start = (0, 0);
+        queue.Enqueue(start);
+        floodMap[start] = '#';
+
+        var visited = new HashSet<(int, int)>();
+        while (queue.Any())
+        {
+            var cur = queue.Dequeue();
+            visited.Add(cur);
+
+            var deltas = new List<(int, int)> {(-1, 0), (1, 0), (0, -1), (0, 1)};
+            foreach (var delta in deltas)
+            {
+                var p = (cur.Item1 + delta.Item1, cur.Item2 + delta.Item2);
+                if (floodMap.TryGetValue(p, out char c))
+                {
+                    if (c == '.' && !visited.Contains(p))
+                    {
+                        queue.Enqueue(p);
+                        floodMap[p] = '#';
+                    }
+                }
+            }
+        }
+
+        // Debugging.
+        for (int row = 0; row < maxHeight; row++)
+        {
+            for (int col = 0; col < maxWidth; col++)
+            {
+                var c = floodMap[(col, row)];
+                Console.Write(c);
+            }
+            Console.WriteLine();
+        }
     }
 }
