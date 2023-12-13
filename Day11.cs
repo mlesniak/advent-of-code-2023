@@ -70,32 +70,31 @@ public class Day11
         // {
         //     Console.WriteLine(position);
         // }
-        var maxX = galaxies.Select(p => p.X).Max() + 1;
-        var maxY = galaxies.Select(p => p.Y).Max() + 1;
-        var n = 1;
-        for (int y = 0; y < maxY; y++)
-        {
-            for (int x = 0; x < maxX; x++)
-            {
-                if (galaxies.Contains(new(x, y)))
-                {
-                    if (n > 9)
-                    {
-                        Console.Write("#");
-                    }
-                    else
-                    {
-                        Console.Write($"{n++}");
-                    }
-                }
-                else
-                {
-                    Console.Write(".");
-                }
-            }
-            Console.WriteLine();
-        }
-
+        // var maxX = galaxies.Select(p => p.X).Max() + 1;
+        // var maxY = galaxies.Select(p => p.Y).Max() + 1;
+        // var n = 1;
+        // for (int y = 0; y < maxY; y++)
+        // {
+        //     for (int x = 0; x < maxX; x++)
+        //     {
+        //         if (galaxies.Contains(new(x, y)))
+        //         {
+        //             if (n > 9)
+        //             {
+        //                 Console.Write("#");
+        //             }
+        //             else
+        //             {
+        //                 Console.Write($"{n++}");
+        //             }
+        //         }
+        //         else
+        //         {
+        //             Console.Write(".");
+        //         }
+        //     }
+        //     Console.WriteLine();
+        // }
 
         var sum = 0;
         for (int i = 0; i < galaxies.Count; i++)
