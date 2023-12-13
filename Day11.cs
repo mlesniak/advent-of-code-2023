@@ -39,7 +39,7 @@ public class Day11
 
         var addX = 0;
         var addY = 0;
-        
+
         for (var y = 0; y < lines.Length; y++)
         {
             // Are we passing an empty row?
@@ -79,7 +79,14 @@ public class Day11
             {
                 if (galaxies.Contains(new(x, y)))
                 {
-                    Console.Write("#");
+                    if (n > 9)
+                    {
+                        Console.Write("#");
+                    }
+                    else
+                    {
+                        Console.Write($"{n++}");
+                    }
                 }
                 else
                 {
@@ -90,22 +97,27 @@ public class Day11
         }
 
 
-        // var sum = 0;
+        var sum = 0;
+        for (int i = 0; i < galaxies.Count; i++)
+        {
+            for (int j = i + 1; j < galaxies.Count; j++)
+            {
+                var g1 = galaxies[i];
+                var g2 = galaxies[j];
+                // Console.WriteLine($"\nCompute {g1} and {g2}");
+                sum += Compute(rows, cols, g1, g2);
+            }
+        }
+        Console.WriteLine(sum);
+
         // for (int i = 0; i < galaxies.Count; i++)
         // {
-        //     for (int j = i + 1; j < galaxies.Count; j++)
-        //     {
-        //         var g1 = galaxies[i];
-        //         var g2 = galaxies[j];
-        //         // Console.WriteLine($"\nCompute {g1} and {g2}");
-        //         sum += Compute(rows, cols, g1, g2);
-        //     }
+        //     Console.WriteLine($"{i+1} {galaxies[i]}");
         // }
-        // Console.WriteLine(sum);
     }
 
     private static int Compute(HashSet<int> rows, HashSet<int> cols, Position g1, Position g2)
     {
-        return 1;
+        return Math.Abs(g1.X - g2.X) + Math.Abs(g1.Y - g2.Y);
     }
 }
