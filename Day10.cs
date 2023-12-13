@@ -351,8 +351,12 @@ public class Day10
         // Flood fill via BFS.
         var queue = new Queue<(int, int)>();
         var start = (0, 0);
-        queue.Enqueue(start);
-        floodMap[start] = '#';
+        queue.Enqueue((0, 0));
+        queue.Enqueue((maxWidth - 1, maxHeight - 1));
+        foreach (var pos in queue)
+        {
+            floodMap[pos] = '#';
+        }
 
         var visited = new HashSet<(int, int)>();
         while (queue.Any())
