@@ -350,9 +350,19 @@ public class Day10
 
         // Flood fill via BFS.
         var queue = new Queue<(int, int)>();
-        var start = (0, 0);
         queue.Enqueue((0, 0));
+        queue.Enqueue((0, maxHeight - 1));
+        queue.Enqueue((maxWidth - 1, 0));
         queue.Enqueue((maxWidth - 1, maxHeight - 1));
+
+        for (int row = 0; row < maxHeight - 1; row++)
+        {
+            if (floodMap[(0, row)] == '.')
+            {
+                queue.Enqueue((0, row));
+            }
+        }
+
         foreach (var pos in queue)
         {
             floodMap[pos] = '#';
@@ -381,16 +391,16 @@ public class Day10
 
 
         // Debugging.
-        for (int row = 0; row < maxHeight; row++)
-        {
-            for (int col = 0; col < maxWidth; col++)
-            {
-                var c = floodMap[(col, row)];
-                Console.Write(c);
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine();
+        // for (int row = 0; row < maxHeight; row++)
+        // {
+        //     for (int col = 0; col < maxWidth; col++)
+        //     {
+        //         var c = floodMap[(col, row)];
+        //         Console.Write(c);
+        //     }
+        //     Console.WriteLine();
+        // }
+        // Console.WriteLine();
 
         var freePoints = floodMap.Where(p => p.Value == '.').Select(p => p.Key).ToHashSet();
         return freePoints;
