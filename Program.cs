@@ -39,6 +39,11 @@ using static Lesniak.AoC2023.Utils;
 // Day9.Part1();
 // Day9.Part2();
 
-Header(10);
+// Header(10);
 // Day10.Part1();
-Day10.Part2();
+// Day10.Part2();
+
+Header(11);
+Day11.Part1();
+// Day11.Part2();
+

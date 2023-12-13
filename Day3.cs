@@ -9,14 +9,6 @@ class Number(string value)
     public override string ToString() => $"{Value}";
 }
 
-record Position(int X, int Y)
-{
-    public static Position operator +(Position a, Position b)
-    {
-        return new Position(a.X + b.X, a.Y + b.Y);
-    }
-}
-
 public class Day3
 {
     public static void Part1()
