@@ -218,8 +218,39 @@ public class Day10
             }
         }
 
-        var maxWidth = lines[0].Length;
-        var maxHeight = lines.Length;
+        var freePointsExpanded = GetFreePoints(lines, path, map, true);
+        var freePointsNormal = GetFreePoints(lines, path, map, false);
+
+        // Remove all points from normal which are in expanded (divide by 2!)
+        var count = 0;
+        foreach ((int, int) insideCandidate in freePointsNormal)
+        {
+            if (!freePointsExpanded.Any(tuple =>
+                {
+                    var a = tuple.Item1 / 2;
+                    var b = tuple.Item2 / 2;
+                    return insideCandidate == (a, b);
+                }))
+            {
+                continue;
+            }
+            count++;
+        }
+        Console.WriteLine(count);
+    }
+
+    private static HashSet<(int, int)> GetFreePoints(string[] lines, HashSet<(int, int)>? path,
+        Dictionary<(int, int), char> map, bool expand)
+    {
+
+        var maxWidth = lines[0].Length * 2;
+        var maxHeight = lines.Length * 2;
+        if (!expand)
+        {
+            maxWidth /= 2;
+            maxHeight /= 2;
+        }
+
         var floodMap = new Dictionary<(int, int), char>();
         for (int row = 0; row < maxHeight; row++)
         {
@@ -229,11 +260,92 @@ public class Day10
             }
         }
 
-        var s = string.Join(", ", path.ToList());
-        Console.WriteLine(s);
+        // var s = string.Join(", ", path.ToList());
+        // Console.WriteLine(s);
         foreach (var pair in path)
         {
-            floodMap[pair] = map[pair];
+            // Double spacing for narrow flood / pipes.
+            // TODO(mlesniak) squeeze only in x a
+            if (expand)
+            {
+                floodMap[(pair.Item1 * 2, pair.Item2 * 2)] = map[pair];
+            }
+            else
+            {
+                floodMap[(pair.Item1, pair.Item2)] = map[pair];
+            }
+        }
+        // Fix holes.
+        foreach (var pair in floodMap)
+        {
+            var p = pair.Key;
+            var c = pair.Value;
+            if (c == '|')
+            {
+                if (floodMap[(p.Item1, p.Item2 - 1)] == '.')
+                {
+                    floodMap[(p.Item1, p.Item2 - 1)] = '|';
+                }
+                if (floodMap[(p.Item1, p.Item2 + 1)] == '.')
+                {
+                    floodMap[(p.Item1, p.Item2 + 1)] = '|';
+                }
+            }
+            if (c == '-')
+            {
+                if (floodMap[(p.Item1 - 1, p.Item2)] == '.')
+                {
+                    floodMap[(p.Item1 - 1, p.Item2)] = '-';
+                }
+                if (floodMap[(p.Item1 + 1, p.Item2)] == '.')
+                {
+                    floodMap[(p.Item1 + 1, p.Item2)] = '-';
+                }
+            }
+            if (c == 'F')
+            {
+                if (floodMap[(p.Item1 + 1, p.Item2)] == '.')
+                {
+                    floodMap[(p.Item1 + 1, p.Item2)] = '-';
+                }
+                if (floodMap[(p.Item1, p.Item2 + 1)] == '.')
+                {
+                    floodMap[(p.Item1, p.Item2 + 1)] = '|';
+                }
+            }
+            if (c == '7')
+            {
+                if (floodMap[(p.Item1 - 1, p.Item2)] == '.')
+                {
+                    floodMap[(p.Item1 - 1, p.Item2)] = '-';
+                }
+                if (floodMap[(p.Item1, p.Item2 + 1)] == '.')
+                {
+                    floodMap[(p.Item1, p.Item2 + 1)] = '|';
+                }
+            }
+            if (c == 'L')
+            {
+                if (floodMap[(p.Item1 + 1, p.Item2)] == '.')
+                {
+                    floodMap[(p.Item1 + 1, p.Item2)] = '-';
+                }
+                if (floodMap[(p.Item1, p.Item2 - 1)] == '.')
+                {
+                    floodMap[(p.Item1, p.Item2 - 1)] = '|';
+                }
+            }
+            if (c == 'J')
+            {
+                if (floodMap[(p.Item1 - 1, p.Item2)] == '.')
+                {
+                    floodMap[(p.Item1 - 1, p.Item2)] = '-';
+                }
+                if (floodMap[(p.Item1, p.Item2 - 1)] == '.')
+                {
+                    floodMap[(p.Item1, p.Item2 - 1)] = '|';
+                }
+            }
         }
 
         // Flood fill via BFS.
@@ -263,6 +375,7 @@ public class Day10
             }
         }
 
+
         // Debugging.
         for (int row = 0; row < maxHeight; row++)
         {
@@ -273,5 +386,9 @@ public class Day10
             }
             Console.WriteLine();
         }
+        Console.WriteLine();
+
+        var freePoints = floodMap.Where(p => p.Value == '.').Select(p => p.Key).ToHashSet();
+        return freePoints;
     }
 }
