@@ -9,3 +9,7 @@ record Position(int X, int Y)
 }
 
 
+// Won't use generics since I'd have to adapt existing code
+// from previous days and I'm too lazy.
+record PositionLong(long X, long Y);
+

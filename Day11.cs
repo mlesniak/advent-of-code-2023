@@ -34,11 +34,14 @@ public class Day11
         }
 
         // TODO(mlesniak) add spacing based on empty rows and columns
-        var galaxies = new List<Position>();
-        var factor = 1;
+        var galaxies = new List<PositionLong>();
+        long factor = 2-1;
+        factor = 10 - 1;
+        factor = 100 - 1;
+        factor = 1_000_000 - 1;
 
-        var addX = 0;
-        var addY = 0;
+        long addX = 0;
+        long addY = 0;
 
         for (var y = 0; y < lines.Length; y++)
         {
@@ -115,7 +118,7 @@ public class Day11
         // }
     }
 
-    private static long Compute(HashSet<long> rows, HashSet<long> cols, Position g1, Position g2)
+    private static long Compute(HashSet<long> rows, HashSet<long> cols, PositionLong g1, PositionLong g2)
     {
         return Math.Abs(g1.X - g2.X) + Math.Abs(g1.Y - g2.Y);
     }
