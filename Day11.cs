@@ -6,7 +6,7 @@ public class Day11
     {
         var lines = File.ReadAllLines("11.txt");
 
-        var rows = new HashSet<int>();
+        var rows = new HashSet<long>();
         for (var y = 0; y < lines.Length; y++)
         {
             if (lines[y].All(c => c == '.'))
@@ -15,7 +15,7 @@ public class Day11
             }
         }
 
-        var cols = new HashSet<int>();
+        var cols = new HashSet<long>();
         for (var x = 0; x < lines[0].Length; x++)
         {
             var ok = true;
@@ -49,7 +49,7 @@ public class Day11
                 continue;
             }
 
-            for (int x = 0; x < lines[y].Length; x++)
+            for (var x = 0; x < lines[y].Length; x++)
             {
                 // Are we passing an empty col?
                 if (cols.Contains(x))
@@ -73,9 +73,9 @@ public class Day11
         // var maxX = galaxies.Select(p => p.X).Max() + 1;
         // var maxY = galaxies.Select(p => p.Y).Max() + 1;
         // var n = 1;
-        // for (int y = 0; y < maxY; y++)
+        // for (long y = 0; y < maxY; y++)
         // {
-        //     for (int x = 0; x < maxX; x++)
+        //     for (long x = 0; x < maxX; x++)
         //     {
         //         if (galaxies.Contains(new(x, y)))
         //         {
@@ -96,7 +96,7 @@ public class Day11
         //     Console.WriteLine();
         // }
 
-        var sum = 0;
+        long sum = 0;
         for (int i = 0; i < galaxies.Count; i++)
         {
             for (int j = i + 1; j < galaxies.Count; j++)
@@ -109,13 +109,13 @@ public class Day11
         }
         Console.WriteLine(sum);
 
-        // for (int i = 0; i < galaxies.Count; i++)
+        // for (long i = 0; i < galaxies.Count; i++)
         // {
         //     Console.WriteLine($"{i+1} {galaxies[i]}");
         // }
     }
 
-    private static int Compute(HashSet<int> rows, HashSet<int> cols, Position g1, Position g2)
+    private static long Compute(HashSet<long> rows, HashSet<long> cols, Position g1, Position g2)
     {
         return Math.Abs(g1.X - g2.X) + Math.Abs(g1.Y - g2.Y);
     }
