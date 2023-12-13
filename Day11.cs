@@ -6,18 +6,6 @@ public class Day11
     {
         var lines = File.ReadAllLines("11.txt");
 
-        var galaxies = new HashSet<Position>();
-        for (var y = 0; y < lines.Length; y++)
-        {
-            for (int x = 0; x < lines[y].Length; x++)
-            {
-                if (lines[y][x] == '#')
-                {
-                    galaxies.Add(new(x, y));
-                } 
-            } 
-        }
-
         var rows = new HashSet<int>();
         for (var y = 0; y < lines.Length; y++)
         {
@@ -26,7 +14,7 @@ public class Day11
                 rows.Add(y);
             }
         }
-        
+
         var cols = new HashSet<int>();
         for (var x = 0; x < lines[0].Length; x++)
         {
@@ -45,6 +33,79 @@ public class Day11
             }
         }
 
-        Console.WriteLine("");
+        // TODO(mlesniak) add spacing based on empty rows and columns
+        var galaxies = new List<Position>();
+        var factor = 1;
+
+        var addX = 0;
+        var addY = 0;
+        
+        for (var y = 0; y < lines.Length; y++)
+        {
+            // Are we passing an empty row?
+            if (rows.Contains(y))
+            {
+                addY += factor;
+                continue;
+            }
+
+            for (int x = 0; x < lines[y].Length; x++)
+            {
+                // Are we passing an empty col?
+                if (cols.Contains(x))
+                {
+                    addX += factor;
+                    continue;
+                }
+
+                if (lines[y][x] == '#')
+                {
+                    galaxies.Add(new(x + addX, y + addY));
+                }
+            }
+            addX = 0;
+        }
+
+        // foreach (var position in galaxies)
+        // {
+        //     Console.WriteLine(position);
+        // }
+        var maxX = galaxies.Select(p => p.X).Max() + 1;
+        var maxY = galaxies.Select(p => p.Y).Max() + 1;
+        var n = 1;
+        for (int y = 0; y < maxY; y++)
+        {
+            for (int x = 0; x < maxX; x++)
+            {
+                if (galaxies.Contains(new(x, y)))
+                {
+                    Console.Write("#");
+                }
+                else
+                {
+                    Console.Write(".");
+                }
+            }
+            Console.WriteLine();
+        }
+
+
+        // var sum = 0;
+        // for (int i = 0; i < galaxies.Count; i++)
+        // {
+        //     for (int j = i + 1; j < galaxies.Count; j++)
+        //     {
+        //         var g1 = galaxies[i];
+        //         var g2 = galaxies[j];
+        //         // Console.WriteLine($"\nCompute {g1} and {g2}");
+        //         sum += Compute(rows, cols, g1, g2);
+        //     }
+        // }
+        // Console.WriteLine(sum);
+    }
+
+    private static int Compute(HashSet<int> rows, HashSet<int> cols, Position g1, Position g2)
+    {
+        return 1;
     }
 }
