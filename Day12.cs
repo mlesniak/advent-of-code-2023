@@ -31,13 +31,13 @@ public class Day12
         while (q.Count > 0)
         {
             var e = q.Dequeue();
-            // Console.WriteLine($"Handling {e}");
+            // // Console.WriteLine($"Handling {e}");
             var idx = e.IndexOf('?');
             if (idx == -1)
             {
                 if (Valid(e, def))
                 {
-                    Console.WriteLine($"Valid configuration: <{e}> against {string.Join(",", def)}");
+                    // Console.WriteLine($"Valid configuration: <{e}> against {string.Join(",", def)}");
                     valid++;
                 }
             }
@@ -58,7 +58,7 @@ public class Day12
         var parts = config.Split(".").Where(s => s.Any()).ToList();
         // foreach (var part in parts)
         // {
-        //     Console.WriteLine($"<{part}>");
+        //     // Console.WriteLine($"<{part}>");
         // }
         if (parts.Count != def.Count)
         {
@@ -83,7 +83,7 @@ public class Day12
             {
                 var es = line.Split(" ");
                 var ints = es[1].Split(",").Select(s => Int32.Parse(s)).ToList();
-                return (es[0], ints);
+                // return (es[0], ints);
                 return (Explode(es[0]), Explode(ints));
             })
             .ToList();
@@ -92,8 +92,8 @@ public class Day12
         var cache = new Dictionary<string, long>();
         foreach (var input in inputs)
         {
-            // Console.WriteLine(input.Item1);
-            // Console.WriteLine(string.Join(",", input.Item2));
+            // // Console.WriteLine(input.Item1);
+            // // Console.WriteLine(string.Join(",", input.Item2));
             sum += Recurse(input.Item1, input.Item2);
         }
         Console.WriteLine(sum);
@@ -102,7 +102,7 @@ public class Day12
     private static long Recurse(string input, List<int> defs, int curSpring = 0, string history = "")
     {
         var key = $"{input}\tdefs={string.Join(",", defs)} curSpring={curSpring}, {history}";
-        Console.WriteLine(key);
+        // Console.WriteLine(key);
 
         if (string.IsNullOrEmpty(input))
         {
@@ -112,12 +112,12 @@ public class Day12
             }
             if (defs.Count == 0 && curSpring == 0)
             {
-                Console.WriteLine($"\t\t\t\t\tall zero, {history}");
+                // Console.WriteLine($"\t\t\t\t\tall zero, {history}");
                 return 1;
             }
             if (defs.Count > 0 && defs[0] == curSpring)
             {
-                Console.WriteLine($"\t\t\t\t\tfinal spring, {history}");
+                // Console.WriteLine($"\t\t\t\t\tfinal spring, {history}");
                 return 1;
             }
 
@@ -191,7 +191,7 @@ public class Day12
             return dot + spring;
         }
 
-        Console.WriteLine("Reached unknown state");
+        // Console.WriteLine("Reached unknown state");
         return 0;
     }
 
