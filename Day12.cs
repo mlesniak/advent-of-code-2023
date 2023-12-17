@@ -37,7 +37,7 @@ public class Day12
             {
                 if (Valid(e, def))
                 {
-                    // Console.WriteLine($"Valid configuration: <{e}> against {string.Join(",", def)}");
+                    Console.WriteLine($"Valid configuration: <{e}> against {string.Join(",", def)}");
                     valid++;
                 }
             }
@@ -74,4 +74,137 @@ public class Day12
 
         return true;
     }
+
+    public static void Part2()
+    {
+        var inputs = File
+            .ReadAllLines("12.txt")
+            .Select(line =>
+            {
+                var es = line.Split(" ");
+                var ints = es[1].Split(",").Select(s => Int32.Parse(s)).ToList();
+                return (es[0], ints);
+                return (Explode(es[0]), Explode(ints));
+            })
+            .ToList();
+
+        long sum = 0;
+        var cache = new Dictionary<string, long>();
+        foreach (var input in inputs)
+        {
+            // Console.WriteLine(input.Item1);
+            // Console.WriteLine(string.Join(",", input.Item2));
+            sum += Recurse(input.Item1, input.Item2);
+        }
+        Console.WriteLine(sum);
+    }
+
+    private static long Recurse(string input, List<int> defs, int curSpring = 0, string history = "")
+    {
+        var key = $"{input}\tdefs={string.Join(",", defs)} curSpring={curSpring}, {history}";
+        Console.WriteLine(key);
+
+        if (string.IsNullOrEmpty(input))
+        {
+            if (defs.Count > 1)
+            {
+                return 0;
+            }
+            if (defs.Count == 0 && curSpring == 0)
+            {
+                Console.WriteLine($"\t\t\t\t\tall zero, {history}");
+                return 1;
+            }
+            if (defs.Count > 0 && defs[0] == curSpring)
+            {
+                Console.WriteLine($"\t\t\t\t\tfinal spring, {history}");
+                return 1;
+            }
+
+            return 0;
+        }
+
+        // Still input left, check if the state can be valid at all.
+        if (defs.Count == 0 && curSpring > 0)
+        {
+            return 0;
+        }
+        if (curSpring > 0 && curSpring > defs[0])
+        {
+            return 0;
+        }
+
+        // Handle inputs.
+        if (input[0] == '#')
+        {
+            return Recurse(input.Substring(1), defs, curSpring + 1, history + input[0]);
+        }
+
+        if (input[0] == '.')
+        {
+            // Do we mark the end of a string of springs from previous char?
+            if (curSpring > 0)
+            {
+                if (curSpring == defs[0])
+                {
+                    // all fine, continue.
+                    return Recurse(input.Substring(1), defs.Slice(1, defs.Count - 1), 0, history + input[0]);
+                }
+
+                // Is not a valid state.
+                return 0;
+            }
+
+            return Recurse(input.Substring(1), defs, curSpring, history + input[0]);
+        }
+
+        // .###.##.#...
+
+        if (input[0] == '?')
+        {
+            long dot = 0;
+            if (curSpring > 0)
+            {
+                // Previous char was a spring. We would end the chain now.
+                //
+                // All fine, i.e. chain is valid? Reset chain and continue.
+                if (curSpring == defs[0])
+                {
+                    dot = Recurse(input.Substring(1), defs.Slice(1, defs.Count - 1), 0, history + ".");
+                }
+                else
+                {
+                    // Did not match with expectation. Abort.
+                    dot = 0;
+                }
+
+
+            }
+            else
+            {
+                // Previous char was a dot as well, no running spring count.
+                dot = Recurse(input.Substring(1), defs, curSpring, history + ".");
+            }
+
+            long spring = Recurse(input.Substring(1), defs, curSpring + 1, history + "#");
+
+            return dot + spring;
+        }
+
+        Console.WriteLine("Reached unknown state");
+        return 0;
+    }
+
+    private static List<int> Explode(List<int> l)
+    {
+        var times = 5;
+        return Enumerable.Repeat(l, times).SelectMany(i => i).ToList();
+    }
+
+    private static string Explode(string s)
+    {
+        var times = 5;
+        return string.Join("?", Enumerable.Repeat(s, times));
+    }
+
 }
