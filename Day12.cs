@@ -94,50 +94,62 @@ public class Day12
         {
             // // Console.WriteLine(input.Item1);
             // // Console.WriteLine(string.Join(",", input.Item2));
-            sum += Recurse(input.Item1, input.Item2);
+            sum += Recurse(cache, input.Item1, input.Item2);
         }
         Console.WriteLine(sum);
     }
 
-    private static long Recurse(string input, List<int> defs, int curSpring = 0, string history = "")
+    private static long Recurse(Dictionary<string, long> cache, string input, List<int> defs, int curSpring = 0,
+        string history = "")
     {
-        var key = $"{input}\tdefs={string.Join(",", defs)} curSpring={curSpring}, {history}";
+        // var key = $"{input}\tdefs={string.Join(",", defs)} curSpring={curSpring}, {history}";
         // Console.WriteLine(key);
+        var cacheKey = $"{input}-{string.Join(",", defs)}-{curSpring}";
+        if (cache.TryGetValue(cacheKey, out long res))
+        {
+            return res;
+        }
 
         if (string.IsNullOrEmpty(input))
         {
             if (defs.Count > 1)
             {
+                cache[cacheKey] = 0;
                 return 0;
             }
             if (defs.Count == 0 && curSpring == 0)
             {
                 // Console.WriteLine($"\t\t\t\t\tall zero, {history}");
+                cache[cacheKey] = 1;
                 return 1;
             }
             if (defs.Count > 0 && defs[0] == curSpring)
             {
                 // Console.WriteLine($"\t\t\t\t\tfinal spring, {history}");
+                cache[cacheKey] = 1;
                 return 1;
             }
 
+            cache[cacheKey] = 0;
             return 0;
         }
 
         // Still input left, check if the state can be valid at all.
         if (defs.Count == 0 && curSpring > 0)
         {
+            cache[cacheKey] = 0;
             return 0;
         }
         if (curSpring > 0 && curSpring > defs[0])
         {
+            cache[cacheKey] = 0;
             return 0;
         }
 
         // Handle inputs.
         if (input[0] == '#')
         {
-            return Recurse(input.Substring(1), defs, curSpring + 1, history + input[0]);
+            return Recurse(cache, input.Substring(1), defs, curSpring + 1, history + input[0]);
         }
 
         if (input[0] == '.')
@@ -148,14 +160,15 @@ public class Day12
                 if (curSpring == defs[0])
                 {
                     // all fine, continue.
-                    return Recurse(input.Substring(1), defs.Slice(1, defs.Count - 1), 0, history + input[0]);
+                    return Recurse(cache, input.Substring(1), defs.Slice(1, defs.Count - 1), 0, history + input[0]);
                 }
 
                 // Is not a valid state.
+                cache[cacheKey] = 0;
                 return 0;
             }
 
-            return Recurse(input.Substring(1), defs, curSpring, history + input[0]);
+            return Recurse(cache, input.Substring(1), defs, curSpring, history + input[0]);
         }
 
         // .###.##.#...
@@ -170,7 +183,7 @@ public class Day12
                 // All fine, i.e. chain is valid? Reset chain and continue.
                 if (curSpring == defs[0])
                 {
-                    dot = Recurse(input.Substring(1), defs.Slice(1, defs.Count - 1), 0, history + ".");
+                    dot = Recurse(cache, input.Substring(1), defs.Slice(1, defs.Count - 1), 0, history + ".");
                 }
                 else
                 {
@@ -183,12 +196,14 @@ public class Day12
             else
             {
                 // Previous char was a dot as well, no running spring count.
-                dot = Recurse(input.Substring(1), defs, curSpring, history + ".");
+                dot = Recurse(cache, input.Substring(1), defs, curSpring, history + ".");
             }
 
-            long spring = Recurse(input.Substring(1), defs, curSpring + 1, history + "#");
+            long spring = Recurse(cache, input.Substring(1), defs, curSpring + 1, history + "#");
 
-            return dot + spring;
+            var sum = dot + spring;
+            cache[cacheKey] = sum;
+            return sum;
         }
 
         // Console.WriteLine("Reached unknown state");
