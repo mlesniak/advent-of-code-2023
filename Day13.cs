@@ -14,7 +14,7 @@ public static class Day13
         foreach (var field in fields)
         {
             // Console.Out.WriteLine($"FIELD:\n{field}");
-            var result = Compute(field);
+            var result = Compute(field, (-1, -1));
             // Console.Out.WriteLine($"{result}");
             sum += result;
         }
@@ -22,7 +22,7 @@ public static class Day13
         Console.Out.WriteLine(sum);
     }
 
-    private static long Compute(string field, long ignoreIndex = -1)
+    private static long Compute(string field, (long, long) ignoreIndex)
     {
         var lines = field.Split("\r\n");
 
@@ -34,7 +34,7 @@ public static class Day13
         // Check for similar columns.
         for (var i = 0; i < columns.Length - 1; i++)
         {
-            if (i == ignoreIndex)
+            if (i == ignoreIndex.Item1)
             {
                 continue;
             }
@@ -67,7 +67,7 @@ public static class Day13
         // Check for similar row.
         for (var i = 0; i < lines.Length - 1; i++)
         {
-            if (i == ignoreIndex)
+            if (ignoreIndex.Item2 == i)
             {
                 continue;
             }
@@ -110,7 +110,8 @@ public static class Day13
         foreach (var field in fields)
         {
             // Console.Out.WriteLine($"FIELD:\n{field}");
-            var ignoreIndex = Compute2(field);
+            // If it's < 1000, it's col, if it's > 1000, it's row
+            (long, long) ignoreIndex = Compute2(field);
 
             int i = 0;
             while (true)
@@ -151,7 +152,9 @@ public static class Day13
     }
 
     // Return index to ignore.
-    private static long Compute2(string field)
+    // (column, row)
+    // -1 if not available.
+    private static (long, long) Compute2(string field)
     {
         var lines = field.Split("\r\n");
 
@@ -183,7 +186,7 @@ public static class Day13
 
                 if (ok)
                 {
-                    return i;
+                    return (i, -1);
                 }
             }
         }
@@ -211,12 +214,13 @@ public static class Day13
 
                 if (ok)
                 {
-                    return i;
+                    return (-1, i);
                 }
             }
         }
 
-        return -1;
+        // TODO(mlesniak) can this actually happen more often?
+        return (-1, -1);
     }
 
     private static bool NearlyEqual(string a, string b)
