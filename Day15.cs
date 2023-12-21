@@ -30,13 +30,29 @@ public class Day15
 
         foreach (var command in commands)
         {
-            Console.Out.WriteLine($"\n{command}");
+            // Console.Out.WriteLine($"\n{command}");
             Process(boxes, command);
-            Debug(boxes);
+            // Debug(boxes);
         }
 
-        Console.Out.WriteLine("\nFinal State");
-        Debug(boxes);
+        // Console.Out.WriteLine("\nFinal State");
+        // Debug(boxes);
+
+        var power = 0;
+        for (int i = 0; i < 255; i++)
+        {
+            var l = boxes[i];
+            if (l.Count == 0)
+            {
+                continue;
+            }
+            for (int j = 0; j < l.Count; j++)
+            {
+                var lens = l[j];
+                power += (i + 1) * (j + 1) * lens.Focal;
+            }
+        }
+        Console.Out.WriteLine(power);
     }
 
     private static void Debug(Dictionary<int, List<Lense>> boxes)
