@@ -28,10 +28,24 @@ public class Day14
             }
         }
 
-        Render(dishes, rocks);
-        Console.Out.WriteLine("");
+        // Render(dishes, rocks);
+        // Console.Out.WriteLine("");
         Move(dishes, rocks, (0, -1));
-        Render(dishes, rocks);
+        // Render(dishes, rocks);
+        var result =Score(dishes, rocks);
+        Console.Out.WriteLine(result);
+    }
+
+    private static int Score(HashSet<Position> dishes, HashSet<Position> rocks)
+    {
+        var maxY = Math.Max(dishes.MaxBy(p => p.Y).Y, rocks.MaxBy(p => p.Y).Y);
+
+        var score = 0;
+        foreach (var dish in dishes)
+        {
+            score += (maxY - dish.Y + 1);
+        }
+        return score;
     }
 
     private static void Render(HashSet<Position> dishes, HashSet<Position> rocks)
