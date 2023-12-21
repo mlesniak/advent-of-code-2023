@@ -12,13 +12,7 @@ public class Day15
         Console.Out.WriteLine(result);
     }
 
-    static int Hash(string s)
-    {
-        return s.Aggregate(0, (c, acc) =>
-        {
-            return (((int)c + acc)* 17) % 256;
-        });
-    }
+    static int Hash(string s) => s.Aggregate(0, (c, acc) => (c + acc) * 17 % 256);
 
     public static void Part2()
     {
