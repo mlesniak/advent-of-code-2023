@@ -267,11 +267,11 @@ public class Day14
 
         for (int i = 0; i < count; i++)
         {
-            // if (i % (count / 10) == 0)
-            // {
-            //     Console.Out.WriteLine(i);
-            //     Console.Out.WriteLine(DateTime.Now - now);
-            // }
+            if (i % (count / 100) == 0)
+            {
+                Console.Out.WriteLine(i);
+                Console.Out.WriteLine(DateTime.Now - now);
+            }
 
             // Console.Out.WriteLine($"\n\n---- Cycle {i}");
             foreach (var direction in cycle)
