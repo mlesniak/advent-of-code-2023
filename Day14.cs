@@ -302,6 +302,7 @@ public class Day14
         // Console.Out.WriteLine(result);
         Console.Out.WriteLine(DateTime.Now - now);
 
+        // ...or, just use a modulo operator 🤦‍♂️
         var s = 0;
         for (int i = cycleStart + 1; i < count; i += cycleLength)
         {
