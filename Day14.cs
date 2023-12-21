@@ -256,17 +256,22 @@ public class Day14
         List<(int, int)> cycle = [(0, -1), (-1, 0), (0, 1), (1, 0)];
         // List<(int, int)> cycle = [(0, -1), (-1, 0)];
 
-        var seen = new HashSet<string>();
+        // value is pos, score
+        var seen = new Dictionary<string, (int, int)>();
         var rs = RenderString(dishes, rocks);
-        seen.Add(rs);
-        
+        seen.Add(rs, (0, Score(dishes, rocks)));
+
+        var cycleLength = 0;
+        var cycleStart = 0;
+        var cycleScore = 0;
+
         for (int i = 0; i < count; i++)
         {
-            if (i % (count / 10) == 0)
-            {
-                Console.Out.WriteLine(i);
-                Console.Out.WriteLine(DateTime.Now - now);
-            }
+            // if (i % (count / 10) == 0)
+            // {
+            //     Console.Out.WriteLine(i);
+            //     Console.Out.WriteLine(DateTime.Now - now);
+            // }
 
             // Console.Out.WriteLine($"\n\n---- Cycle {i}");
             foreach (var direction in cycle)
@@ -277,29 +282,41 @@ public class Day14
                 // Console.Out.WriteLine("");
             }
             var renderString = RenderString(dishes, rocks);
-            if (seen.Contains(renderString))
+            if (seen.TryGetValue(renderString, out var posScore))
             {
-                Console.Out.WriteLine($"Loop after i={i} cycles");
-                Console.Out.WriteLine($"\nAfter {i + 1}");
-                Render(dishes, rocks);
+                // Console.Out.WriteLine($"Loop after i={i} cycles, at position {pos}");
+                cycleLength = i - posScore.Item1;
+                cycleStart = posScore.Item1;
+                cycleScore = posScore.Item2;
+                // Console.Out.WriteLine($"\nAfter {i + 1}");
+                // Render(dishes, rocks);
                 break;
             }
-            seen.Add(renderString); // TODO(mlesniak) very ugly...
-            Console.Out.WriteLine($"\nAfter {i + 1}");
-            Render(dishes, rocks);
             var sc = Score(dishes, rocks);
-            Console.Out.WriteLine(sc);
+            seen.Add(renderString, (i, sc));
+            // Console.Out.WriteLine($"\nAfter {i + 1}, stored as {i}");
+            // Render(dishes, rocks);
+            // Console.Out.WriteLine(sc);
         }
-        var result = Score(dishes, rocks);
-        Console.Out.WriteLine(result);
+        // var result = Score(dishes, rocks);
+        // Console.Out.WriteLine(result);
         Console.Out.WriteLine(DateTime.Now - now);
 
         var s = 0;
-        var periodic = 6;
-        for (int i = 3; i < 1_000_000_000; i += periodic + 1)
+        for (int i = cycleStart + 1; i < count; i += cycleLength)
         {
             s = i;
         }
-        Console.Out.WriteLine(s);
+        var target = count - s + cycleStart;
+        // Console.Out.WriteLine(s);
+        // Console.Out.WriteLine(target);
+
+        foreach (var pair in seen)
+        {
+            if (pair.Value.Item1 == target)
+            {
+                Console.Out.WriteLine(pair.Value.Item2);
+            }
+        }
     }
 }
