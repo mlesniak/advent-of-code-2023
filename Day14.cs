@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.Design;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Xml.Schema;
 
 namespace Lesniak.AoC2023;
 
@@ -73,6 +75,36 @@ public class Day14
             }
             Console.Out.WriteLine();
         }
+    }
+
+    private static string RenderString(List<Position> dishes, HashSet<Position> rocks)
+    {
+        var sb = new StringBuilder();
+        var maxX = Math.Max(dishes.MaxBy(p => p.X).X, rocks.MaxBy(p => p.X).X);
+        var maxY = Math.Max(dishes.MaxBy(p => p.Y).Y, rocks.MaxBy(p => p.Y).Y);
+
+        for (int row = 0; row <= maxY; row++)
+        {
+            for (int col = 0; col <= maxX; col++)
+            {
+                if (dishes.Contains(new(col, row)))
+                {
+                    sb.Append("O");
+                }
+                else if (rocks.Contains(new(col, row)))
+                {
+                    sb.Append("#");
+                }
+                else
+                {
+                    sb.Append(".");
+                }
+
+            }
+            sb.Append("\n");
+        }
+
+        return sb.ToString();
     }
 
     class PositionComparerX : IComparer<Position>
@@ -218,19 +250,24 @@ public class Day14
 
         // Render(dishes, rocks);
         // Console.Out.WriteLine("");
-        var count = 1_000_000;
+        var count = 1_000_000_000;
         var now = DateTime.Now;
-        
+
         List<(int, int)> cycle = [(0, -1), (-1, 0), (0, 1), (1, 0)];
         // List<(int, int)> cycle = [(0, -1), (-1, 0)];
+
+        var seen = new HashSet<string>();
+        var rs = RenderString(dishes, rocks);
+        seen.Add(rs);
         
         for (int i = 0; i < count; i++)
         {
             if (i % (count / 10) == 0)
             {
                 Console.Out.WriteLine(i);
+                Console.Out.WriteLine(DateTime.Now - now);
             }
-            
+
             // Console.Out.WriteLine($"\n\n---- Cycle {i}");
             foreach (var direction in cycle)
             {
@@ -239,12 +276,30 @@ public class Day14
                 // Render(dishes, rocks);
                 // Console.Out.WriteLine("");
             }
-            // Console.Out.WriteLine($"\nAfter {i + 1}");
-            // Render(dishes, rocks);
+            var renderString = RenderString(dishes, rocks);
+            if (seen.Contains(renderString))
+            {
+                Console.Out.WriteLine($"Loop after i={i} cycles");
+                Console.Out.WriteLine($"\nAfter {i + 1}");
+                Render(dishes, rocks);
+                break;
+            }
+            seen.Add(renderString); // TODO(mlesniak) very ugly...
+            Console.Out.WriteLine($"\nAfter {i + 1}");
+            Render(dishes, rocks);
+            var sc = Score(dishes, rocks);
+            Console.Out.WriteLine(sc);
         }
         var result = Score(dishes, rocks);
         Console.Out.WriteLine(result);
-        var dur = DateTime.Now - now;
-        Console.Out.WriteLine(dur);
+        Console.Out.WriteLine(DateTime.Now - now);
+
+        var s = 0;
+        var periodic = 6;
+        for (int i = 3; i < 1_000_000_000; i += periodic + 1)
+        {
+            s = i;
+        }
+        Console.Out.WriteLine(s);
     }
 }
