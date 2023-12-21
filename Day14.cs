@@ -4,11 +4,9 @@ public class Day14
 {
     public static void Part1()
     {
-        
     }
 
     public static void Part2()
     {
-
     }
 }
