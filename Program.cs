@@ -55,6 +55,10 @@ using static Lesniak.AoC2023.Utils;
 // Day13.Part1();
 // Day13.Part2();
 
-Header(14);
+// Header(14);
 // Day14.Part1();
-Day14.Part2();
+// Day14.Part2();
+
+Header(15);
+Day15.Part1();
+// Day15.Part2();
