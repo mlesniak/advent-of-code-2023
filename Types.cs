@@ -6,6 +6,12 @@ record Position(int X, int Y)
     {
         return new Position(a.X + b.X, a.Y + b.Y);
     }
+    
+    public static Position operator +(Position a, (int, int) tuple)
+    {
+        return new Position(a.X + tuple.Item1, a.Y + tuple.Item2);
+    }
+
 }
 
 
