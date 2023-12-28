@@ -72,13 +72,20 @@ public class Day16
                 }
                 visited.Add(curBeam.Pos);
                 
-                Console.WriteLine($"\nProcessing beam {curBeam}");
+                // Console.WriteLine($"\nProcessing beam {curBeam}");
                 beams.RemoveAt(i);
+                var beamVisited = new HashSet<Position>();
                 while (curBeam != null)
                 {
+                    if (beamVisited.Contains(curBeam.Pos))
+                    {
+                        // We are in a loop.
+                        break;
+                    }
+                    beamVisited.Add(curBeam.Pos);
                     tiles.Add(curBeam.Pos);
                     curBeam = Compute(curBeam, mirrors, beams);
-                    Console.WriteLine($"Next {curBeam}");
+                    // Console.WriteLine($"Next {curBeam}");
                 }
 
             }
@@ -155,7 +162,7 @@ public class Day16
                         case Direction.East:
                         case Direction.West:
                             var item = new Beam(nextPos, Direction.North);
-                            Console.WriteLine($"Adding new beam {item}");
+                            // Console.WriteLine($"Adding new beam {item}");
                             beams.Add(item);
                             return new Beam(nextPos, Direction.South);
                         default:
@@ -167,7 +174,7 @@ public class Day16
                         case Direction.North:
                         case Direction.South:
                             var item = new Beam(nextPos, Direction.West);
-                            Console.WriteLine($"Adding new beam {item}");
+                            // Console.WriteLine($"Adding new beam {item}");
                             beams.Add(item);
                             return new Beam(nextPos, Direction.East);
                         case Direction.East:
