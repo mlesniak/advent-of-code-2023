@@ -59,16 +59,26 @@ public class Day16
         var beam = new Beam(new Position(0, 0), Direction.East);
         var beams = new List<Beam> {beam};
         var tiles = new HashSet<Position>();
+        var visited = new HashSet<Position>();
         while (beams.Count > 0)
         {
             for (int i = beams.Count - 1; i >= 0; i--)
             {
                 var curBeam = beams[i];
+                if (visited.Contains(curBeam.Pos))
+                {
+                    beams.RemoveAt(i);
+                    continue;
+                }
+                visited.Add(curBeam.Pos);
+                
+                Console.WriteLine($"\nProcessing beam {curBeam}");
                 beams.RemoveAt(i);
                 while (curBeam != null)
                 {
                     tiles.Add(curBeam.Pos);
                     curBeam = Compute(curBeam, mirrors, beams);
+                    Console.WriteLine($"Next {curBeam}");
                 }
 
             }
@@ -76,9 +86,21 @@ public class Day16
 
         Console.WriteLine("Result");
         Console.WriteLine(tiles.Count);
-        foreach (var position in tiles)
+
+        for (int y = 0; y < maxHeight; y++)
         {
-            Console.WriteLine(position);
+            for (int x = 0; x < maxWidth; x++)
+            {
+                if (tiles.Contains(new Position(x, y)))
+                {
+                    Console.Write("#");
+                }
+                else
+                {
+                    Console.Write(".");
+                }
+            }
+            Console.WriteLine("");
         }
     }
 
@@ -132,18 +154,22 @@ public class Day16
                             return beam with {Pos = nextPos};
                         case Direction.East:
                         case Direction.West:
-                            beams.Add(new Beam(nextPos with {Y = nextPos.Y - 1}, Direction.North));
-                            return new Beam(nextPos with {Y = nextPos.Y + 1}, Direction.South);
+                            var item = new Beam(nextPos, Direction.North);
+                            Console.WriteLine($"Adding new beam {item}");
+                            beams.Add(item);
+                            return new Beam(nextPos, Direction.South);
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
-                    case '-':
+                case '-':
                     switch (beam.Direction)
                     {
                         case Direction.North:
                         case Direction.South:
-                            beams.Add(new Beam(nextPos with {X = nextPos.X - 1}, Direction.West));
-                            return new Beam(nextPos with {X = nextPos.X + 1}, Direction.East);
+                            var item = new Beam(nextPos, Direction.West);
+                            Console.WriteLine($"Adding new beam {item}");
+                            beams.Add(item);
+                            return new Beam(nextPos, Direction.East);
                         case Direction.East:
                         case Direction.West:
                             return beam with {Pos = nextPos};
