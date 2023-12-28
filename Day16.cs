@@ -74,15 +74,15 @@ public class Day16
                 
                 // Console.WriteLine($"\nProcessing beam {curBeam}");
                 beams.RemoveAt(i);
-                var beamVisited = new HashSet<Position>();
+                var beamVisited = new HashSet<Beam>();
                 while (curBeam != null)
                 {
-                    if (beamVisited.Contains(curBeam.Pos))
+                    if (beamVisited.Contains(curBeam))
                     {
                         // We are in a loop.
                         break;
                     }
-                    beamVisited.Add(curBeam.Pos);
+                    beamVisited.Add(curBeam);
                     tiles.Add(curBeam.Pos);
                     curBeam = Compute(curBeam, mirrors, beams);
                     // Console.WriteLine($"Next {curBeam}");
