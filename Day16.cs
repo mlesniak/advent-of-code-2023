@@ -71,7 +71,7 @@ public class Day16
                     continue;
                 }
                 visited.Add(curBeam.Pos);
-                
+
                 // Console.WriteLine($"\nProcessing beam {curBeam}");
                 beams.RemoveAt(i);
                 var beamVisited = new HashSet<Beam>();
@@ -192,4 +192,95 @@ public class Day16
         return beam with {Pos = nextPos};
     }
 
+    public static void Part2()
+    {
+        var mirrors = new Dictionary<Position, char>();
+        var lines = File.ReadAllLines("16.txt");
+        maxHeight = lines.Length - 1;
+        maxWidth = lines[0].Length - 1;
+        for (var y = 0; y < lines.Length; y++)
+        {
+            var line = lines[y];
+            for (var x = 0; x < line.Length; x++)
+            {
+                var c = line[x];
+                if (c == '.')
+                {
+                    continue;
+                }
+
+                mirrors.Add(new Position(x, y), line[x]);
+            }
+        }
+
+        var start = DateTime.Now;
+        var max = Int32.MinValue;
+        for (int i = 0; i < maxHeight; i++)
+        {
+            var beam = new Beam(new Position(0, i), Direction.East);
+            var noTiles = ComputeForBeam(beam, mirrors);
+            max = Math.Max(max, noTiles);
+        }
+        for (int i = 0; i < maxHeight; i++)
+        {
+            var beam = new Beam(new Position(maxHeight-1, i), Direction.West);
+            var noTiles = ComputeForBeam(beam, mirrors);
+            max = Math.Max(max, noTiles);
+        }
+        for (int i = 0; i < maxWidth; i++)
+        {
+            var beam = new Beam(new Position(i, 0), Direction.South);
+            var noTiles = ComputeForBeam(beam, mirrors);
+            max = Math.Max(max, noTiles);
+        }
+        for (int i = 0; i < maxWidth; i++)
+        {
+            var beam = new Beam(new Position(i, maxWidth-1), Direction.North);
+            var noTiles = ComputeForBeam(beam, mirrors);
+            max = Math.Max(max, noTiles);
+        }
+
+        Console.WriteLine($"{DateTime.Now - start}");
+        Console.WriteLine("Result");
+        Console.WriteLine(max);
+    }
+
+    private static int ComputeForBeam(Beam beam, Dictionary<Position, char> mirrors)
+    {
+
+        var beams = new List<Beam> {beam};
+        var tiles = new HashSet<Position>();
+        var visited = new HashSet<Position>();
+        while (beams.Count > 0)
+        {
+            for (int i = beams.Count - 1; i >= 0; i--)
+            {
+                var curBeam = beams[i];
+                if (visited.Contains(curBeam.Pos))
+                {
+                    beams.RemoveAt(i);
+                    continue;
+                }
+                visited.Add(curBeam.Pos);
+
+                // Console.WriteLine($"\nProcessing beam {curBeam}");
+                beams.RemoveAt(i);
+                var beamVisited = new HashSet<Beam>();
+                while (curBeam != null)
+                {
+                    if (beamVisited.Contains(curBeam))
+                    {
+                        // We are in a loop.
+                        break;
+                    }
+                    beamVisited.Add(curBeam);
+                    tiles.Add(curBeam.Pos);
+                    curBeam = Compute(curBeam, mirrors, beams);
+                    // Console.WriteLine($"Next {curBeam}");
+                }
+
+            }
+        }
+        return tiles.Count;
+    }
 }
