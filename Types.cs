@@ -1,6 +1,6 @@
 namespace Lesniak.AoC2023;
 
-record Position(int X, int Y)
+public record Position(int X, int Y)
 {
     public static Position operator +(Position a, Position b)
     {
