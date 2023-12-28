@@ -91,24 +91,24 @@ public class Day16
             }
         }
 
-        Console.WriteLine("Result");
+        // Console.WriteLine("Result");
         Console.WriteLine(tiles.Count);
 
-        for (int y = 0; y < maxHeight; y++)
-        {
-            for (int x = 0; x < maxWidth; x++)
-            {
-                if (tiles.Contains(new Position(x, y)))
-                {
-                    Console.Write("#");
-                }
-                else
-                {
-                    Console.Write(".");
-                }
-            }
-            Console.WriteLine("");
-        }
+        // for (int y = 0; y < maxHeight; y++)
+        // {
+        //     for (int x = 0; x < maxWidth; x++)
+        //     {
+        //         if (tiles.Contains(new Position(x, y)))
+        //         {
+        //             Console.Write("#");
+        //         }
+        //         else
+        //         {
+        //             Console.Write(".");
+        //         }
+        //     }
+        //     Console.WriteLine("");
+        // }
     }
 
     // Beams allows to add new beams when splitting.
@@ -240,8 +240,8 @@ public class Day16
             max = Math.Max(max, noTiles);
         }
 
-        Console.WriteLine($"{DateTime.Now - start}");
-        Console.WriteLine("Result");
+        // Console.WriteLine($"{DateTime.Now - start}");
+        // Console.WriteLine("Result");
         Console.WriteLine(max);
     }
 
