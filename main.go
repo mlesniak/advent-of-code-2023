@@ -2,18 +2,35 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io"
+	"math"
 	"os"
 )
 
 func main() {
 	arr := read2D("17")
+	print2D(arr)
 
-	for _, a := range arr {
-		for _, v := range a {
-			print(v)
+	dist := make([][]int, len(arr))
+	for i := range dist {
+		dist[i] = make([]int, len(arr[0]))
+		for j := range dist[i] {
+			dist[i][j] = math.MaxInt
 		}
-		println()
+	}
+	print2D(dist)
+}
+
+func print2D(arr [][]int) {
+	for _, a := range arr {
+		for i, v := range a {
+			fmt.Printf("%d", v)
+			if i != len(a)-1 {
+				fmt.Printf(",")
+			}
+		}
+		fmt.Println()
 	}
 }
 
