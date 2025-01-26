@@ -1,16 +1,32 @@
 package main
 
-import (
-	"bufio"
-	"fmt"
-	"io"
-	"math"
-	"os"
+import "container/heap"
+import "math"
+import "fmt"
+import "os"
+import "bufio"
+import "io"
+
+type Direction int
+
+const (
+	Left Direction = iota
+	Right
+	Straight
 )
+
+type Path struct {
+	x, y int
+	cost int
+	path []Direction
+
+	// For pq maintenance.
+	index int
+}
 
 func main() {
 	arr := read2D("17")
-	print2D(arr)
+	//print2D(arr)
 
 	dist := make([][]int, len(arr))
 	for i := range dist {
@@ -19,7 +35,26 @@ func main() {
 			dist[i][j] = math.MaxInt
 		}
 	}
-	print2D(dist)
+	dist[0][0] = 0
+	//print2D(dist)
+
+	var pq PriorityQueue
+	pq = append(pq, &Path{
+		x:     0,
+		y:     0,
+		cost:  0,
+		index: 0,
+	})
+	pq = append(pq, &Path{
+		x:     1,
+		y:     0,
+		cost:  -3,
+		index: 0,
+	})
+	heap.Init(&pq)
+
+	var next *Path = heap.Pop(&pq).(*Path)
+	fmt.Println(*next)
 }
 
 func print2D(arr [][]int) {
