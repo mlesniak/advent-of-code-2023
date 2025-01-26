@@ -39,22 +39,21 @@ func main() {
 	//print2D(dist)
 
 	var pq PriorityQueue
-	pq = append(pq, &Path{
-		x:     0,
-		y:     0,
-		cost:  0,
-		index: 0,
-	})
-	pq = append(pq, &Path{
-		x:     1,
-		y:     0,
-		cost:  -3,
-		index: 0,
-	})
+	for i := range dist {
+		for j := range dist[i] {
+			pq = append(pq, &Path{
+				x:     j,
+				y:     i,
+				cost:  dist[i][j],
+				index: -1,
+			})
+		}
+	}
 	heap.Init(&pq)
 
 	var next *Path = heap.Pop(&pq).(*Path)
 	fmt.Println(*next)
+	// @mlesniak loop, initialize algorithm.
 }
 
 func print2D(arr [][]int) {
