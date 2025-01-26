@@ -1,11 +1,13 @@
 package main
 
-import "container/heap"
-import "math"
+import (
+	"bufio"
+	"container/heap"
+	"io"
+	"math"
+	"os"
+)
 import "fmt"
-import "os"
-import "bufio"
-import "io"
 
 type Direction int
 
@@ -51,9 +53,23 @@ func main() {
 	}
 	heap.Init(&pq)
 
-	var next *Path = heap.Pop(&pq).(*Path)
-	fmt.Println(*next)
-	// @mlesniak loop, initialize algorithm.
+	next := heap.Pop(&pq).(*Path)
+	for {
+		fmt.Println("Looking at %s", next)
+		if next.x == len(arr[0])-1 && next.y == len(arr)-1 {
+			break
+		}
+
+		// compute available paths based on current position, orientation and past path.
+
+		if pq.Len() == 0 {
+			panic("No valid path found")
+		}
+		next = heap.Pop(&pq).(*Path)
+	}
+
+	println("Solution")
+	fmt.Println("%s", next)
 }
 
 func print2D(arr [][]int) {
