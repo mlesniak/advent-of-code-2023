@@ -149,11 +149,6 @@ func main() {
 	heap.Init(&pq)
 
 	pathCost := make(map[string]int)
-	//for y := 0; y < len(cost); y++ {
-	//	for x := 0; x < len(cost[y]); x++ {
-	//		pathCost[[2]int{x, y}] = math.MaxInt
-	//	}
-	//}
 
 	for {
 		if len(pq) == 0 {
@@ -169,13 +164,9 @@ func main() {
 			break
 			//continue
 		}
-		// 11/5 $69 [[R F F R F L F F L F R F F R F L F F R F L F F R F F L F R F F]] S
-		if strings.Contains(cur.String(), "[[R F F R F L F F L F R F F R F L F F R F L F F R F F L F R F F F L") {
-			println("breakpoint")
-		}
+
 		// Add rotations.
-		// We don't allow successive rotations.
-		if len(cur.path) == 0 || last(cur.path) == Forward {
+		if len(cur.path) == 0 || lastSteps(cur.path, 4, Forward) {
 			var left = cur.clone()
 			left.path = append(left.path, Left)
 			left.facing = left.facing.left()
@@ -189,7 +180,8 @@ func main() {
 
 		// After a rotation, we only allow steps. Not sure, if this limits the paths
 		// we want to reach, since we can't go backwards without rotating twice in a row.
-		if !line(cur.path, 3) {
+		if forwards(cur.path) <= 10 {
+			//if !line(cur.path, 3) {
 			var forward = cur.clone()
 			nx, ny := forward.facing.step(forward.x, forward.y)
 			if _, ok := cur.visited[[2]int{nx, ny}]; !ok {
@@ -205,7 +197,7 @@ func main() {
 					} else {
 						cur.visited[[2]int{nx, ny}] = struct{}{}
 					}
-					v := visitedKey(Visited{nx, ny, LastThree(forward.path)})
+					v := visitedKey(Visited{nx, ny, LastN(forward.path, 10)})
 					curCost := pathCost[v]
 					// We can't simply compare cost, since we have additional restrictions.
 					if forward.cost < curCost || curCost == 0 {
@@ -218,12 +210,32 @@ func main() {
 	}
 }
 
+func forwards(steps []Step) int {
+	count := 0
+	for k := len(steps) - 1; k >= 0; k-- {
+		if steps[k] == Forward {
+			count++
+		} else {
+			break
+		}
+	}
+	return count
+}
+
 func LastThree[T any](s []T) []T {
 	if len(s) < 3 {
 		return s
 	}
 
 	return s[len(s)-3:]
+}
+
+func LastN[T any](s []T, num int) []T {
+	if len(s) < num {
+		return s
+	}
+
+	return s[len(s)-num:]
 }
 
 type Visited struct {
@@ -299,8 +311,18 @@ func line(path []Step, max int) bool {
 	return true
 }
 
-func last(path []Step) Step {
-	return path[len(path)-1]
+func lastSteps(path []Step, num int, step Step) bool {
+	if len(path) < num {
+		return false
+	}
+
+	for k := len(path) - 1; k >= len(path)-num; k-- {
+		if path[k] != step {
+			return false
+		}
+	}
+
+	return true
 }
 
 func print2D(arr [][]int) {
