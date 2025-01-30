@@ -4,13 +4,10 @@ import (
 	"bufio"
 	"container/heap"
 	"io"
-	"math"
 	"os"
 	"strings"
 )
 import "fmt"
-
-// @mlesniak maybe a general data structure for the problem? is this idiomatic go code?
 
 type Step int
 
@@ -151,13 +148,12 @@ func main() {
 	})
 	heap.Init(&pq)
 
-	c := -1
-	pathCost := make(map[[2]int]int)
-	for y := 0; y < len(cost); y++ {
-		for x := 0; x < len(cost[y]); x++ {
-			pathCost[[2]int{x, y}] = math.MaxInt
-		}
-	}
+	pathCost := make(map[string]int)
+	//for y := 0; y < len(cost); y++ {
+	//	for x := 0; x < len(cost[y]); x++ {
+	//		pathCost[[2]int{x, y}] = math.MaxInt
+	//	}
+	//}
 
 	for {
 		if len(pq) == 0 {
@@ -165,18 +161,12 @@ func main() {
 		}
 		cur := heap.Pop(&pq).(*Path)
 		//fmt.Println(cur)
-		if cur.cost > c {
-			println(c)
-			c = cur.cost
-		}
-
-		// @mlesniak check cost to reach a specific coodinate
-		//           if it is higher than existing, abort path
 
 		// Did we reach the goal?
 		if cur.x == len(cost[0])-1 && cur.y == len(cost)-1 {
 			fmt.Println("\n\nSolution:", cur)
 			visualize(cost, cur.path)
+			break
 			//continue
 		}
 		// 11/5 $69 [[R F F R F L F F L F R F F R F L F F R F L F F R F F L F R F F]] S
@@ -215,16 +205,39 @@ func main() {
 					} else {
 						cur.visited[[2]int{nx, ny}] = struct{}{}
 					}
-					curCost := pathCost[[2]int{nx, ny}]
+					v := visitedKey(Visited{nx, ny, LastThree(forward.path)})
+					curCost := pathCost[v]
 					// We can't simply compare cost, since we have additional restrictions.
-					if forward.cost < curCost || curCost+20 < forward.cost {
+					if forward.cost < curCost || curCost == 0 {
 						heap.Push(&pq, &forward)
-						pathCost[[2]int{nx, ny}] = forward.cost
+						pathCost[v] = forward.cost
 					}
 				}
 			}
 		}
 	}
+}
+
+func LastThree[T any](s []T) []T {
+	if len(s) < 3 {
+		return s
+	}
+
+	return s[len(s)-3:]
+}
+
+type Visited struct {
+	x, y  int
+	steps []Step
+}
+
+func visitedKey(v Visited) string {
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("%d,%d", v.x, v.y))
+	for _, step := range v.steps {
+		sb.WriteString("," + step.String())
+	}
+	return sb.String()
 }
 
 func visualize(cost [][]int, path []Step) {
