@@ -158,7 +158,7 @@ func main() {
 		//fmt.Println(cur)
 
 		// Did we reach the goal?
-		if cur.x == len(cost[0])-1 && cur.y == len(cost)-1 {
+		if cur.x == len(cost[0])-1 && cur.y == len(cost)-1 && LastValues(cur.path, 4, Forward) {
 			fmt.Println("\n\nSolution:", cur)
 			visualize(cost, cur.path)
 			break
@@ -180,7 +180,11 @@ func main() {
 
 		// After a rotation, we only allow steps. Not sure, if this limits the paths
 		// we want to reach, since we can't go backwards without rotating twice in a row.
-		if forwards(cur.path) <= 10 {
+		if strings.Contains(cur.String(), "[[R F F F F F F F F F F") {
+			println("breakpoint")
+		}
+		// a minimum of four blocks in that direction before it can turn (or even before it can stop at the end).
+		if forwards(cur.path) < 10 {
 			//if !line(cur.path, 3) {
 			var forward = cur.clone()
 			nx, ny := forward.facing.step(forward.x, forward.y)
@@ -228,6 +232,20 @@ func LastThree[T any](s []T) []T {
 	}
 
 	return s[len(s)-3:]
+}
+
+func LastValues(path []Step, num int, expected Step) bool {
+	if len(path) < num {
+		return false
+	}
+
+	for k := len(path) - 1; k >= len(path)-num; k-- {
+		if path[k] != expected {
+			return false
+		}
+	}
+
+	return true
 }
 
 func LastN[T any](s []T, num int) []T {
