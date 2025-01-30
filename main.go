@@ -189,7 +189,7 @@ func main() {
 
 		// After a rotation, we only allow steps. Not sure, if this limits the paths
 		// we want to reach, since we can't go backwards without rotating twice in a row.
-		if !line(cur.path) {
+		if !line(cur.path, 3) {
 			var forward = cur.clone()
 			nx, ny := forward.facing.step(forward.x, forward.y)
 			if _, ok := cur.visited[[2]int{nx, ny}]; !ok {
@@ -284,13 +284,19 @@ func (o Orientation) char() int8 {
 	panic("")
 }
 
-func line(path []Step) bool {
+func line(path []Step, max int) bool {
 	s := len(path)
-	if s < 3 {
+	if s < max {
 		return false
 	}
 
-	return path[s-1] == Forward && path[s-2] == Forward && path[s-3] == Forward
+	for k := s - 1; k >= s-max; k-- {
+		if path[k] != Forward {
+			return false
+		}
+	}
+
+	return true
 }
 
 func last(path []Step) Step {
