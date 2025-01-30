@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"container/heap"
 	"io"
+	"math"
 	"os"
+	"strings"
 )
 import "fmt"
 
@@ -105,6 +107,8 @@ type Path struct {
 	cost   int
 	path   []Step
 	facing Orientation
+	// @mlesniak do we really need it when we have the global cost matrix?
+	visited map[[2]int]struct{}
 
 	// For pq maintenance.
 	index int
@@ -117,14 +121,19 @@ func (p Path) String() string {
 func (p *Path) clone() Path {
 	var np = make([]Step, len(p.path))
 	copy(np, p.path)
+	var vs = make(map[[2]int]struct{})
+	for k, _ := range p.visited {
+		vs[k] = struct{}{}
+	}
 
 	return Path{
-		x:      p.x,
-		y:      p.y,
-		cost:   p.cost,
-		index:  p.index,
-		facing: p.facing,
-		path:   np,
+		x:       p.x,
+		y:       p.y,
+		cost:    p.cost,
+		index:   p.index,
+		facing:  p.facing,
+		path:    np,
+		visited: vs,
 	}
 }
 
@@ -142,20 +151,38 @@ func main() {
 	})
 	heap.Init(&pq)
 
+	c := -1
+	pathCost := make(map[[2]int]int)
+	for y := 0; y < len(cost); y++ {
+		for x := 0; x < len(cost[y]); x++ {
+			pathCost[[2]int{x, y}] = math.MaxInt
+		}
+	}
+
 	for {
 		if len(pq) == 0 {
 			break
 		}
 		cur := heap.Pop(&pq).(*Path)
+		//fmt.Println(cur)
+		if cur.cost > c {
+			println(c)
+			c = cur.cost
+		}
+
+		// @mlesniak check cost to reach a specific coodinate
+		//           if it is higher than existing, abort path
 
 		// Did we reach the goal?
 		if cur.x == len(cost[0])-1 && cur.y == len(cost)-1 {
 			fmt.Println("\n\nSolution:", cur)
 			visualize(cost, cur.path)
 			//continue
-			break
 		}
-
+		// 11/5 $69 [[R F F R F L F F L F R F F R F L F F R F L F F R F F L F R F F]] S
+		if strings.Contains(cur.String(), "[[R F F R F L F F L F R F F R F L F F R F L F F R F F L F R F F F L") {
+			println("breakpoint")
+		}
 		// Add rotations.
 		// We don't allow successive rotations.
 		if len(cur.path) == 0 || last(cur.path) == Forward {
@@ -175,22 +202,25 @@ func main() {
 		if !line(cur.path) {
 			var forward = cur.clone()
 			nx, ny := forward.facing.step(forward.x, forward.y)
-			if _, ok := visited[[2]int{nx, ny}]; !ok {
+			if _, ok := cur.visited[[2]int{nx, ny}]; !ok {
 				if !(nx < 0 || nx >= len(cost[0]) || ny < 0 || ny >= len(cost)) {
+					// check that entering a field is worth it by checking if we are cheaper than a visited path
+					forward.visited[[2]int{nx, ny}] = struct{}{}
 					forward.path = append(forward.path, Forward)
 					forward.cost += cost[ny][nx]
-					if forward.cost < 0 {
-						println("breakpoint")
-					}
 					forward.x = nx
 					forward.y = ny
 					if nx == len(cost[0])-1 && ny == len(cost)-1 {
 						// At the end? Do not add to visit list.
 					} else {
-						visited[[2]int{nx, ny}] = struct{}{}
+						cur.visited[[2]int{nx, ny}] = struct{}{}
 					}
-					heap.Push(&pq, &forward)
-					//fmt.Println("Adding", forward)
+					curCost := pathCost[[2]int{nx, ny}]
+					// We can't simply compare cost, since we have additional restrictions.
+					if forward.cost < curCost || curCost+20 < forward.cost {
+						heap.Push(&pq, &forward)
+						pathCost[[2]int{nx, ny}] = forward.cost
+					}
 				}
 			}
 		}
