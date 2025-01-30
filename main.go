@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"container/heap"
 	"io"
-	"math"
 	"os"
 )
 import "fmt"
+
+// @mlesniak maybe a general data structure for the problem? is this idiomatic go code?
 
 type Step int
 
@@ -128,102 +129,79 @@ func (p *Path) clone() Path {
 }
 
 func main() {
-	costs, grid := readGrid()
+	cost := read2D("17")
 	visited := make(map[[2]int]struct{})
 	visited[[2]int{0, 0}] = struct{}{}
 
-	// pq contains the next node to evaluate based on their accumulated cost.
 	var pq PriorityQueue
-	for i := range grid {
-		for j := range grid[i] {
-			pq = append(pq, &Path{
-				x:     j,
-				y:     i,
-				cost:  grid[i][j],
-				index: -1,
-			})
-		}
-	}
+	pq = append(pq, &Path{
+		x:     0,
+		y:     0,
+		cost:  0,
+		index: -1,
+	})
 	heap.Init(&pq)
 
-	next := heap.Pop(&pq).(*Path)
 	for {
-		//fmt.Println("\nLooking at", next)
-		//for k, _ := range visited {
-		//	fmt.Println("  Visited:", k)
-		//}
+		if len(pq) == 0 {
+			break
+		}
+		cur := heap.Pop(&pq).(*Path)
 
-		if next.x == len(grid[0])-1 && next.y == len(grid)-1 {
+		// Did we reach the goal?
+		if cur.x == len(cost[0])-1 && cur.y == len(cost)-1 {
+			fmt.Println("\n\nSolution:", cur)
+			visualize(cost, cur.path)
+			//continue
 			break
 		}
 
-		// Compute available paths based on current position, orientation and past path.
-		if len(next.path) == 0 || last(next.path) == Forward {
-			// Add rotations
-			var left = next.clone()
+		// Add rotations.
+		// We don't allow successive rotations.
+		if len(cur.path) == 0 || last(cur.path) == Forward {
+			var left = cur.clone()
 			left.path = append(left.path, Left)
 			left.facing = left.facing.left()
 			heap.Push(&pq, &left)
-			//fmt.Println("Adding", left)
 
-			var right = next.clone()
+			var right = cur.clone()
 			right.path = append(right.path, Right)
 			right.facing = right.facing.right()
 			heap.Push(&pq, &right)
-			//fmt.Println("Adding", right)
+		}
 
-			// Add step if fewer than three steps
-			if !line(next.path) {
-				var forward = next.clone()
-				nx, ny := forward.facing.step(forward.x, forward.y)
-				if _, ok := visited[[2]int{nx, ny}]; !ok {
-					if !(nx < 0 || nx >= len(grid[0]) || ny < 0 || ny >= len(grid)) {
-						visited[[2]int{nx, ny}] = struct{}{}
-						forward.path = append(forward.path, Forward)
-						forward.cost += costs[ny][nx]
-						forward.x = nx
-						forward.y = ny
-						heap.Push(&pq, &forward)
-						//fmt.Println("Adding", forward)
+		// After a rotation, we only allow steps. Not sure, if this limits the paths
+		// we want to reach, since we can't go backwards without rotating twice in a row.
+		if !line(cur.path) {
+			var forward = cur.clone()
+			nx, ny := forward.facing.step(forward.x, forward.y)
+			if _, ok := visited[[2]int{nx, ny}]; !ok {
+				if !(nx < 0 || nx >= len(cost[0]) || ny < 0 || ny >= len(cost)) {
+					forward.path = append(forward.path, Forward)
+					forward.cost += cost[ny][nx]
+					if forward.cost < 0 {
+						println("breakpoint")
 					}
-				}
-			}
-		} else {
-			// After a rotation, we only allow a step. Not sure, if this limits the paths
-			// we want to reach, since we can't go backwards without rotating twice in a row.
-			if !line(next.path) {
-				var forward = next.clone()
-				nx, ny := forward.facing.step(forward.x, forward.y)
-				if _, ok := visited[[2]int{nx, ny}]; !ok {
-					if !(nx < 0 || nx >= len(grid[0]) || ny < 0 || ny >= len(grid)) {
+					forward.x = nx
+					forward.y = ny
+					if nx == len(cost[0])-1 && ny == len(cost)-1 {
+						// At the end? Do not add to visit list.
+					} else {
 						visited[[2]int{nx, ny}] = struct{}{}
-						forward.path = append(forward.path, Forward)
-						forward.cost += costs[ny][nx]
-						forward.x = nx
-						forward.y = ny
-						heap.Push(&pq, &forward)
-						//fmt.Println("Adding", forward)
 					}
+					heap.Push(&pq, &forward)
+					//fmt.Println("Adding", forward)
 				}
 			}
 		}
-
-		if pq.Len() == 0 {
-			//panic("No valid path found")
-			break
-		}
-		next = heap.Pop(&pq).(*Path)
 	}
-
-	fmt.Println(next)
-	visualize(costs, next.path)
 }
 
 func visualize(cost [][]int, path []Step) {
 	face := North
 	x, y := 0, 0
 
-	coords := make(map[[2]int]struct{})
+	coords := make(map[[2]int]Orientation)
 	for _, p := range path {
 		switch p {
 		case Left:
@@ -232,20 +210,35 @@ func visualize(cost [][]int, path []Step) {
 			face = face.right()
 		case Forward:
 			x, y = face.step(x, y)
-			coords[[2]int{x, y}] = struct{}{}
+			coords[[2]int{x, y}] = face
 		}
 	}
 
 	for y = 0; y < len(cost); y++ {
 		for x = 0; x < len(cost[y]); x++ {
-			if _, ok := coords[[2]int{x, y}]; ok {
-				print(".")
+			if d, ok := coords[[2]int{x, y}]; ok {
+				fmt.Printf("%c", d.char())
 			} else {
-				print(cost[y][x])
+				fmt.Printf("%d", cost[y][x])
 			}
 		}
-		println()
+		fmt.Println()
 	}
+}
+
+func (o Orientation) char() int8 {
+	switch o {
+	case East:
+		return '>'
+	case West:
+		return '<'
+	case North:
+		return '^'
+	case South:
+		return 'v'
+	}
+
+	panic("")
 }
 
 func line(path []Step) bool {
@@ -259,19 +252,6 @@ func line(path []Step) bool {
 
 func last(path []Step) Step {
 	return path[len(path)-1]
-}
-
-func readGrid() ([][]int, [][]int) {
-	cost := read2D("17")
-	grid := make([][]int, len(cost))
-	for i := range grid {
-		grid[i] = make([]int, len(cost[0]))
-		for j := range grid[i] {
-			grid[i][j] = math.MaxInt
-		}
-	}
-	grid[0][0] = 0
-	return cost, grid
 }
 
 func print2D(arr [][]int) {
