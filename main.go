@@ -150,11 +150,16 @@ func main() {
 
 	pathCost := make(map[string]int)
 
+	minCost := -1
 	for {
 		if len(pq) == 0 {
 			break
 		}
 		cur := heap.Pop(&pq).(*Path)
+		if minCost != cur.cost {
+			println(minCost)
+			minCost = cur.cost
+		}
 		//fmt.Println(cur)
 
 		// Did we reach the goal?
@@ -180,9 +185,9 @@ func main() {
 
 		// After a rotation, we only allow steps. Not sure, if this limits the paths
 		// we want to reach, since we can't go backwards without rotating twice in a row.
-		if strings.Contains(cur.String(), "[[R F F F F F F F F F F") {
-			println("breakpoint")
-		}
+		//if strings.Contains(cur.String(), "[[R F F F F F F F F F F") {
+		//	println("breakpoint")
+		//}
 		// a minimum of four blocks in that direction before it can turn (or even before it can stop at the end).
 		if forwards(cur.path) < 10 {
 			//if !line(cur.path, 3) {
@@ -201,10 +206,10 @@ func main() {
 					} else {
 						cur.visited[[2]int{nx, ny}] = struct{}{}
 					}
-					v := visitedKey(Visited{nx, ny, LastN(forward.path, 10)})
-					curCost := pathCost[v]
+					v := visitedKey(Visited{nx, ny, forward.facing, LastN(forward.path, 10)})
+					curCost, found := pathCost[v]
 					// We can't simply compare cost, since we have additional restrictions.
-					if forward.cost < curCost || curCost == 0 {
+					if forward.cost < curCost || !found {
 						heap.Push(&pq, &forward)
 						pathCost[v] = forward.cost
 					}
@@ -213,6 +218,8 @@ func main() {
 		}
 	}
 }
+
+// 881 too high
 
 func forwards(steps []Step) int {
 	count := 0
@@ -257,13 +264,14 @@ func LastN[T any](s []T, num int) []T {
 }
 
 type Visited struct {
-	x, y  int
-	steps []Step
+	x, y   int
+	facing Orientation
+	steps  []Step
 }
 
 func visitedKey(v Visited) string {
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("%d,%d", v.x, v.y))
+	sb.WriteString(fmt.Sprintf("%d,%d,%s", v.x, v.y, v.facing.String()))
 	for _, step := range v.steps {
 		sb.WriteString("," + step.String())
 	}
