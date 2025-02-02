@@ -135,7 +135,7 @@ func (p *Path) clone() Path {
 }
 
 func main() {
-	cost := read2D("17")
+	cost := read2D("17.txt")
 	visited := make(map[[2]int]struct{})
 	visited[[2]int{0, 0}] = struct{}{}
 
